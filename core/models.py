@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-"""
+
 class Rol(models.Model):
     id_rol = models.IntegerField(primary_key=True, verbose_name='1=Cliente, 2=Vendedor, 3=Contador, 4=Bodeguero, 5=Administrador')
     nombre_rol = models.CharField(max_length=30)
@@ -87,4 +87,3 @@ class Detalle_comprado(models.Model):
     venta_c = models.ForeignKey(Venta, on_delete=models.CASCADE)
     def __str__(self) -> str:
         return self.nombre_prod_c
-"""
