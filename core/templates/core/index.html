@@ -7,6 +7,11 @@
     <title>ola</title>
 </head>
 <body>
-    
+    <h1>Listado de Categorías</h1>
+    <ul>
+        {% for categoria in categorias_serializadas %}
+            <li style="color: red;">{{ categoria.nombre_categoria }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
