@@ -1,18 +1,18 @@
+{% extends 'core/plantillaCategorias.html'%}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>ola</title>
-</head>
-<body>
-    <h1>Listado de Categorías</h1>
-    <ul>
-        {% for categoria in categorias %}
-            <li style="color: red;">{{ categoria.nombre_categoria }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+
+{% block titulo %}
+    <title>Pagina Principal</title>
+{% endblock titulo %}
+
+{% block disenos %}
+    <link rel="stylesheet" type="text/css" href="{% static  'core/css/general.css'%}">
+{% endblock disenos %}
+
+{% block cuerpo %}
+        
+{% endblock cuerpo %}
+    
+{% block js %}
+    
+{% endblock js %}
