@@ -9,10 +9,12 @@ from .models import Rol, Pregunta, Categoria, Consulta, Usuario, Producto, Venta
 import requests
 # Create your views here.
 
-
+##Serializers para las tablas
 class listaCategoriasApi(generics.ListAPIView):
     queryset = Categoria.objects.all()
     serializer_class = categoriaSerializer
+
+
 
 ###No hay cuenta
 def mostrarIndex(request):
@@ -22,6 +24,14 @@ def mostrarIndex(request):
     contexto = {"categorias" : categorias}
 
     return render(request, 'core/index.html',contexto)
+
+def mostrarLogin(request):
+
+    categorias = obtener_categorias()
+
+    contexto = {"categorias" : categorias}
+
+    return render(request, 'core/login.html',contexto)
 
 
 def obtener_categorias():

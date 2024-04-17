@@ -23,16 +23,37 @@
 </head>
 
 <body>
-
-        <nav class="navbar navbar-expand-sm bg-light justify-content-center">
-            <ul class="navbar-nav">
-            {% for categoria in categorias %}
-              <li class="nav-item">
-                <a class="nav-link" href="#">{{categoria.nombre_categoria}}</a>
-              </li>
-            {% endfor %}
-            </ul>
-        </nav>
+    <div class="container-fluid bg-dark py-2">
+        <div class="row align-items-center">
+            
+            <div class="col-auto">
+                <img src="{% static  'core/img/logo.jpg'%}" alt="Logo" class="img-fluid logo">
+            </div>    
+            
+            
+            <div class="col text-right">
+                <div class="d-inline-block text-center">
+                    <a href="#" class="text-light enlaces">Registrarse </a>
+                    <a href="{% url 'mostrarLogin' %}" class="text-light enlaces">Iniciar sesión</a>
+                    <a href="#" class="text-light enlaces ml-3">Consultas</a>
+                    <a href="#" class="text-light enlaces ml-3">Crear cuenta</a>
+                    <a href="#" class="text-light enlaces">Pedido</a>
+                    <a href="#" class="text-light enlaces">Perfil</a>
+                    <a href="#" class="text-light enlaces ml-3">Carrito</a>
+                    <a href="#" class="text-light enlaces ml-3">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-sm bg-secondary justify-content-center">
+        <ul class="navbar-nav">
+        {% for categoria in categorias %}
+            <li class="nav-item">
+                <a class="nav-link enlaces" href="#">{{categoria.nombre_categoria}}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </nav>
 
     
 
