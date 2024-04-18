@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from datetime import date, timedelta
 from django.utils.translation import activate
 from django.contrib import messages
-from core.serializers import categoriaSerializer, usuarioSerializer, productoSerializer
+from core.serializers import categoriaSerializer, usuarioSerializer, productoSerializer, consultaSerializer, ventaSerializer, detalleSerializer, detalleCompradoSerializer
 from .models import Rol, Pregunta, Categoria, Consulta, Usuario, Producto, Venta, Detalle,  Detalle_comprado
 import requests
 # Create your views here.
@@ -21,6 +21,24 @@ class listaUsuariosApi(generics.ListAPIView):
 class listaProductosApi(generics.ListAPIView):
     queryset = Producto.objects.all()
     serializer_class = productoSerializer
+
+class listaVentasApi(generics.ListAPIView):
+    queryset = Venta.objects.all()
+    serializer_class = ventaSerializer
+
+class listaConsultasApi(generics.ListAPIView):
+    queryset = Consulta.objects.all()
+    serializer_class = consultaSerializer
+
+class listaDetallesApi(generics.ListAPIView):
+    queryset = Detalle.objects.all()
+    serializer_class = detalleSerializer
+
+class listaComprasApi(generics.ListAPIView):
+    queryset = Detalle_comprado.objects.all()
+    serializer_class = detalleCompradoSerializer
+
+
 
 
 ###No hay cuenta

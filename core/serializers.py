@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Categoria, Usuario, Producto
+from .models import Categoria, Consulta, Usuario, Producto, Venta, Detalle,  Detalle_comprado
 
 
 class categoriaSerializer(serializers.ModelSerializer):
@@ -15,4 +15,25 @@ class usuarioSerializer(serializers.ModelSerializer):
 class productoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
+        fields = '__all__'
+
+class consultaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consulta
+        fields = '__all__'
+
+
+class ventaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Venta
+        fields = '__all__'
+
+class detalleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Detalle
+        fields = '__all__'
+
+class detalleCompradoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Detalle_comprado
         fields = '__all__'
