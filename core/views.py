@@ -72,8 +72,8 @@ def obtener_categorias():
 
 def inicioSesion(request):
     
-    correoI = request.POST['correo_ini']
-    claveI = request.POST['contra_ini']
+    correoI = request.POST['username']
+    claveI = request.POST['password']
 
     try:
         user1 = User.objects.get(username = correoI)

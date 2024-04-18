@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import mostrarIndex, mostrarLogin
+from .views import mostrarIndex, mostrarLogin, inicioSesion
 from . import views
 
 urlpatterns=[
@@ -7,6 +7,7 @@ urlpatterns=[
     ###No cuenta
     path('',mostrarIndex,name="mostrarIndex"),
     path('login/',mostrarLogin,name="mostrarLogin"),
+    path('inicioSesion/',inicioSesion, name="inicioSesion"),
     path('api/categorias/', views.listaCategoriasApi.as_view(), name='api-categorias'),
     path('api/usuarios/', views.listaUsuariosApi.as_view(), name='api-usuarios'),
     path('api/productos/', views.listaProductosApi.as_view(), name='api-productos'),
