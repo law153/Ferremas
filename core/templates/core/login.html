@@ -16,7 +16,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title text-center">Iniciar sesión</h5>
-                    <form>
+                    <form id="ini-sesion" action="{% url 'inicioSesion' %}" method="post" enctype="application/x-www-form-urlencoded">
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de usuario</label>
                             <input type="text" class="form-control" id="username" name="username" placeholder="Ingrese su nombre de usuario">

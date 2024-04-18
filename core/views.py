@@ -2,11 +2,13 @@ from rest_framework import generics
 from rest_framework.generics import ListAPIView
 from django.shortcuts import render, redirect
 from datetime import date, timedelta
-from django.utils.translation import activate
 from django.contrib import messages
 from core.serializers import categoriaSerializer, usuarioSerializer, productoSerializer, consultaSerializer, ventaSerializer, detalleSerializer, detalleCompradoSerializer
 from .models import Rol, Pregunta, Categoria, Consulta, Usuario, Producto, Venta, Detalle,  Detalle_comprado
 import requests
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth import authenticate,login, logout
 # Create your views here.
 
 ##Serializers para las tablas
@@ -67,6 +69,33 @@ def obtener_categorias():
     else:
         return None
 
+
+def inicioSesion(request):
+    
+    correoI = request.POST['correo_ini']
+    claveI = request.POST['contra_ini']
+
+    try:
+        user1 = User.objects.get(username = correoI)
+    except User.DoesNotExist:
+        
+        return redirect('mostrarLogin')
+    
+    pass_valida = check_password(claveI, user1.password)
+    if not pass_valida:
+        
+        return redirect('mostrarLogin')
+    usuario = Usuario.objects.get(correo = correoI, clave = claveI)
+    user = authenticate(username = correoI, password = claveI)
+    if user is not None:
+        login(request, user)
+        request.session['username'] = user1.username
+        return redirect('mostrarIndex')
+
+    else:
+       
+        return redirect('mostrarIni_sesion')
+    
 ###Cliente
 
 ###Vendedor
