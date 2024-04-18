@@ -48,7 +48,9 @@ def mostrarIndex(request):
 
     categorias = obtener_categorias()
 
-    contexto = {"categorias" : categorias}
+    rol = request.session.get('rol',0)
+
+    contexto = {"categorias" : categorias, "rol": rol}
 
     return render(request, 'core/index.html',contexto)
 
@@ -90,12 +92,17 @@ def inicioSesion(request):
     if user is not None:
         login(request, user)
         request.session['username'] = user1.username
+        request.session['rol'] = usuario.rol.id_rol
         return redirect('mostrarIndex')
 
     else:
        
         return redirect('mostrarIni_sesion')
     
+def cierreSesion(request):
+    logout(request)
+    return redirect('mostrarIndex')
+
 ###Cliente
 
 ###Vendedor

@@ -39,9 +39,11 @@
                     <a href="#" class="text-light enlaces ml-3">Consultas</a>
                     <a href="#" class="text-light enlaces ml-3">Crear cuenta</a>
                     <a href="#" class="text-light enlaces">Pedido</a>
-                    <a href="#" class="text-light enlaces">Perfil</a>
+                    {% if rol == 5 %}
+                        <a href="#" class="text-light enlaces">Perfil</a>
+                    {% endif %}
                     <a href="#" class="text-light enlaces ml-3">Carrito</a>
-                    <a href="#" class="text-light enlaces ml-3">Cerrar sesión</a>
+                    <a href="{% url 'cierreSesion' %}" class="text-light enlaces ml-3">Cerrar sesión</a>
                 </div>
             </div>
         </div>
