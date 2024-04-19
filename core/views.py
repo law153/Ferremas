@@ -147,10 +147,6 @@ def obtener_usuario(correo):
         return None 
 
 
-
-
-
-
 def inicioSesion(request):
     if request.method == 'POST':
         correoI = request.POST['username']
