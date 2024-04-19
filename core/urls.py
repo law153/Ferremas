@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import mostrarIndex, mostrarLogin, inicioSesion, cierreSesion
+from .views import mostrarIndex, mostrarLogin, inicioSesion, cierreSesion, mostrarProductos
 from . import views
 
 urlpatterns=[
@@ -7,6 +7,7 @@ urlpatterns=[
     ###No cuenta
     path('',mostrarIndex,name="mostrarIndex"),
     path('login/',mostrarLogin,name="mostrarLogin"),
+    path('productos/',mostrarProductos,name="mostrarProductos"),
     path('inicioSesion/',inicioSesion, name="inicioSesion"),
     path('cierreSesion/',cierreSesion,name="cierreSesion"),
     path('api/categorias/', views.listaCategoriasApi.as_view(), name='api-categorias'),

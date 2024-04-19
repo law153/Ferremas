@@ -34,16 +34,26 @@
             
             <div class="col text-right">
                 <div class="d-inline-block text-center">
-                    <a href="#" class="text-light enlaces">Registrarse </a>
-                    <a href="{% url 'mostrarLogin' %}" class="text-light enlaces">Iniciar sesión</a>
-                    <a href="#" class="text-light enlaces ml-3">Consultas</a>
-                    <a href="#" class="text-light enlaces ml-3">Crear cuenta</a>
-                    <a href="#" class="text-light enlaces">Pedido</a>
-                    {% if rol == 5 %}
-                        <a href="#" class="text-light enlaces">Perfil</a>
+                    {% if rol == 0 %}
+                        <a href="#" class="text-light enlaces">Registrarse</a>
+                        <a href="{% url 'mostrarLogin' %}" class="text-light enlaces">Iniciar sesión</a>
                     {% endif %}
-                    <a href="#" class="text-light enlaces ml-3">Carrito</a>
-                    <a href="{% url 'cierreSesion' %}" class="text-light enlaces ml-3">Cerrar sesión</a>
+                    {% if rol == 1  %}
+                        <a href="#" class="text-light enlaces ml-3">Consultas</a>
+                        <a href="#" class="text-light enlaces ml-3">Carrito</a>
+                    {% endif %}
+
+                        <a href="#" class="text-light enlaces">Pedido</a>
+                        
+                    {% if rol == 5 %}
+                        <a href="#" class="text-light enlaces ml-3">Crear cuenta</a>
+                    {% endif %}
+                    {% if rol != 0 %}
+                        <a href="#" class="text-light enlaces">Perfil</a>
+                        
+                        <a href="{% url 'cierreSesion' %}" class="text-light enlaces ml-3">Cerrar sesión</a>
+                    {% endif %}
+                        
                 </div>
             </div>
         </div>
@@ -52,7 +62,7 @@
         <ul class="navbar-nav">
         {% for categoria in categorias %}
             <li class="nav-item">
-                <a class="nav-link enlaces" href="#">{{categoria.nombre_categoria}}</a>
+                <a class="nav-link enlaces" href="{% url 'mostrarProductos' %}">{{categoria.nombre_categoria}}</a>
             </li>
         {% endfor %}
         </ul>

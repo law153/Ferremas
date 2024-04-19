@@ -1,0 +1,39 @@
+{% extends 'core/plantillaCategorias.html'%}
+{% load static %}
+
+{% block titulo %}
+    <title>Productos</title>
+{% endblock titulo %}
+
+{% block disenos %}
+    <link rel="stylesheet" type="text/css" href="{% static  'core/css/general.css'%}">
+{% endblock disenos %}
+
+{% block cuerpo %}
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
+        {% for producto in productos %}
+            <div class="col" style="padding-top: 10px;">
+                <div class="card">
+                    <img src="{{ producto.foto_prod }}" class="card-img-top imagen_prod" alt="{{ producto.nombre_prod }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre_prod }}</h5>
+                        <p class="card-text">{{ producto.marca }}</p>
+                        <p class="card-text"> $ {{ producto.precio }}</p>
+                        <a href="" class="btn btn-primary">Ver producto</a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if forloop.counter|divisibleby:3 and not forloop.last %}
+                </div><div class="row row-cols-1 row-cols-md-3 g-4">
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock cuerpo %}
+    
+{% block js %}
+    
+{% endblock js %}

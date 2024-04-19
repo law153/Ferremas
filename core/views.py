@@ -58,13 +58,35 @@ def mostrarLogin(request):
 
     categorias = obtener_categorias()
 
-    contexto = {"categorias" : categorias}
+    rol = request.session.get('rol',0)
+
+    contexto = {"categorias" : categorias, "rol": rol}
 
     return render(request, 'core/login.html',contexto)
+
+def mostrarProductos(request):
+
+    categorias = obtener_categorias()
+
+    productos = obtener_productos()
+
+    rol = request.session.get('rol',0)
+
+    contexto = {"categorias" : categorias, "rol": rol, "productos": productos}
+
+    return render(request, 'core/productos.html',contexto)
 
 
 def obtener_categorias():
     url_servicio = 'http://localhost:8000/api/categorias/'
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None
+    
+def obtener_productos():
+    url_servicio = 'http://localhost:8000/api/productos/'
     respuesta = requests.get(url_servicio)
     if respuesta.status_code == 200:
         return respuesta.json()
