@@ -1,0 +1,35 @@
+{% extends 'core/plantillaCategorias.html'%}
+{% load static %}
+
+{% block titulo %}
+    <title>Producto</title>
+{% endblock titulo %}
+
+{% block disenos %}
+    <link rel="stylesheet" type="text/css" href="{% static  'core/css/general.css'%}">
+{% endblock disenos %}
+
+{% block cuerpo %}
+    <div class="container my-5">
+    {% for p in producto%}
+        <div class="row">
+            <div class="col-md-4">
+                <!-- Imagen del producto -->
+                <img src="{{ p.foto_prod }}" class="img-fluid imagen_prod_pag" alt="{{ p.nombre_prod }}">
+            </div>
+            <div class="col-md-8">
+                <!-- Detalles del producto -->
+                <h2>{{ p.nombre_prod }}</h2>
+                <p class="text-muted">{{ p.marca }}</p>
+                <p>{{ p.descripcion }}</p>
+                <p><strong>Precio:</strong> $ {{ p.precio }}</p>
+                <p><strong>Stock:</strong> {{ p.stock }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock cuerpo %}
+    
+{% block js %}
+    
+{% endblock js %}

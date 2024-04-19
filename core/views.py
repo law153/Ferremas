@@ -9,6 +9,7 @@ import requests
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import authenticate,login, logout
+import json
 # Create your views here.
 
 ##Serializers para las tablas
@@ -93,6 +94,18 @@ def mostrarProductos(request, id_cate):
     return render(request, 'core/productos.html',contexto)
 
 
+def mostrarProducto(request, id_prod):
+
+    categorias = obtener_categorias()
+
+    producto = obtener_producto(id_prod)
+
+    rol = request.session.get('rol',0)
+
+    contexto = {"categorias" : categorias, "rol": rol, "producto": producto}
+
+    return render(request, 'core/producto.html',contexto)
+
 def obtener_categorias():
     url_servicio = 'http://localhost:8000/api/categorias/'
     respuesta = requests.get(url_servicio)
@@ -109,14 +122,16 @@ def obtener_productos_cate(id_cate):
         return respuesta.json()
     else:
         return None 
-
-def obtener_productos():
-    url_servicio = 'http://localhost:8000/api/productos/'
+    
+def obtener_producto(id_prod):
+    url_servicio = f'http://localhost:8000/api/producto/?cod_prod={id_prod}'
+    print(url_servicio)
     respuesta = requests.get(url_servicio)
     if respuesta.status_code == 200:
         return respuesta.json()
     else:
-        return None
+        return None 
+
 
 
 
