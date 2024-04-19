@@ -21,6 +21,11 @@ class listaUsuariosApi(generics.ListAPIView):
     queryset = Usuario.objects.all()
     serializer_class = usuarioSerializer
 
+class UsuarioPorCorreoApi(generics.RetrieveAPIView):
+    queryset = Usuario.objects.all()
+    serializer_class = usuarioSerializer
+    lookup_field = 'correo'
+
 class listaProductosApi(generics.ListAPIView):
     serializer_class = productoSerializer
 
@@ -131,6 +136,15 @@ def obtener_producto(id_prod):
         return respuesta.json()
     else:
         return None 
+    
+def obtener_usuario(correo):
+    url_servicio = f'http://localhost:8000/api/usuario/{correo}'
+    print(url_servicio)
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None 
 
 
 
@@ -138,31 +152,30 @@ def obtener_producto(id_prod):
 
 
 def inicioSesion(request):
-    
-    correoI = request.POST['username']
-    claveI = request.POST['password']
+    if request.method == 'POST':
+        correoI = request.POST['username']
+        claveI = request.POST['password']
 
-    try:
-        user1 = User.objects.get(username = correoI)
-    except User.DoesNotExist:
+        try:
+            user1 = User.objects.get(username=correoI)
+        except User.DoesNotExist:
+            return redirect('mostrarLogin')
         
-        return redirect('mostrarLogin')
-    
-    pass_valida = check_password(claveI, user1.password)
-    if not pass_valida:
-        
-        return redirect('mostrarLogin')
-    usuario = Usuario.objects.get(correo = correoI, clave = claveI)
-    user = authenticate(username = correoI, password = claveI)
-    if user is not None:
-        login(request, user)
-        request.session['username'] = user1.username
-        request.session['rol'] = usuario.rol.id_rol
-        return redirect('mostrarIndex')
+        pass_valida = check_password(claveI, user1.password)
+        if not pass_valida:
+            return redirect('mostrarLogin')
 
-    else:
-       
-        return redirect('mostrarIni_sesion')
+        # Obtener usuario desde la API
+        usuario_api = obtener_usuario(correoI)
+        if usuario_api:
+            request.session['username'] = user1.username
+            request.session['rol'] = usuario_api['rol'] 
+            user = authenticate(username=correoI, password=claveI)
+            if user is not None:
+                login(request, user)
+                return redirect('mostrarIndex')
+        
+    return redirect('mostrarIni_sesion')
     
 def cierreSesion(request):
     logout(request)
