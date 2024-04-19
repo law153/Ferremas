@@ -21,8 +21,24 @@ class listaUsuariosApi(generics.ListAPIView):
     serializer_class = usuarioSerializer
 
 class listaProductosApi(generics.ListAPIView):
-    queryset = Producto.objects.all()
     serializer_class = productoSerializer
+
+    def get_queryset(self):
+        queryset = Producto.objects.all()
+        categoria = self.request.query_params.get('categoria')
+        if categoria is not None:
+            queryset = queryset.filter(categoria=categoria)
+        return queryset
+    
+class productoApi(generics.ListAPIView):
+    serializer_class = productoSerializer
+
+    def get_queryset(self):
+        queryset = Producto.objects.all()
+        codigo = self.request.query_params.get('cod_prod')
+        if codigo is not None:
+            queryset = queryset.filter(cod_prod=codigo)
+        return queryset
 
 class listaVentasApi(generics.ListAPIView):
     queryset = Venta.objects.all()
@@ -64,11 +80,11 @@ def mostrarLogin(request):
 
     return render(request, 'core/login.html',contexto)
 
-def mostrarProductos(request):
+def mostrarProductos(request, id_cate):
 
     categorias = obtener_categorias()
 
-    productos = obtener_productos()
+    productos = obtener_productos_cate(id_cate)
 
     rol = request.session.get('rol',0)
 
@@ -84,7 +100,16 @@ def obtener_categorias():
         return respuesta.json()
     else:
         return None
-    
+
+def obtener_productos_cate(id_cate):
+    url_servicio = f'http://localhost:8000/api/productos/?categoria={id_cate}'
+    print(url_servicio)
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None 
+
 def obtener_productos():
     url_servicio = 'http://localhost:8000/api/productos/'
     respuesta = requests.get(url_servicio)
@@ -92,6 +117,9 @@ def obtener_productos():
         return respuesta.json()
     else:
         return None
+
+
+
 
 
 def inicioSesion(request):

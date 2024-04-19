@@ -7,7 +7,7 @@ urlpatterns=[
     ###No cuenta
     path('',mostrarIndex,name="mostrarIndex"),
     path('login/',mostrarLogin,name="mostrarLogin"),
-    path('productos/',mostrarProductos,name="mostrarProductos"),
+    path('productos/<id_cate>',mostrarProductos,name="mostrarProductos"),
     path('inicioSesion/',inicioSesion, name="inicioSesion"),
     path('cierreSesion/',cierreSesion,name="cierreSesion"),
     path('api/categorias/', views.listaCategoriasApi.as_view(), name='api-categorias'),

@@ -62,7 +62,7 @@
         <ul class="navbar-nav">
         {% for categoria in categorias %}
             <li class="nav-item">
-                <a class="nav-link enlaces" href="{% url 'mostrarProductos' %}">{{categoria.nombre_categoria}}</a>
+                <a class="nav-link enlaces" href="{% url 'mostrarProductos' categoria.id_categoria %}">{{categoria.nombre_categoria}}</a>
             </li>
         {% endfor %}
         </ul>
