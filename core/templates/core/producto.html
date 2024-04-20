@@ -28,7 +28,11 @@
                     <a href="{% url 'mostrarLogin' %}" class="btn btn-primary">Iniciar sesión</a>
                 {% endif %}
                 {% if rol == 1 %}
-                    <a href="#" class="btn btn-primary">Agregar al carrito</a>
+                    <form action="{% url 'agregarAlCarrito' %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary">Agregar al carrito</button>
+                        <input type="hidden" name="codigo" value="{{ p.cod_prod }}">
+                    </form>
                 {% endif %}
             </div>
         </div>

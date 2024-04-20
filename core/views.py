@@ -211,6 +211,40 @@ def cierreSesion(request):
     logout(request)
     return redirect('mostrarIndex')
 
+
+def agregarAlCarrito(request):
+    cod_produc = request.POST['codigo']
+    productoC = Producto.objects.get(cod_prod = cod_produc)
+
+    username = request.session.get('username')
+    usuarioC = Usuario.objects.get(correo = username)
+        
+    fecha_hoy = date.today()
+    entrega = timedelta(999)
+    fecha_e = fecha_hoy + entrega
+
+    carrito = Venta.objects.filter(usuario = usuarioC, estado='ACTIVO').first()
+
+    if carrito:
+        detalle1 = Detalle.objects.filter(venta = carrito, producto = productoC)
+        if detalle1:
+            detalle = Detalle.objects.get(venta = carrito, producto = productoC)
+            detalle.cantidad += 1
+            detalle.subtotal += productoC.precio
+            detalle.save()
+
+                
+        else:
+            Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
+
+
+    else:
+        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC.precio, carrito = 1, usuario = usuarioC)
+
+        Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito, producto = productoC)
+            
+    return redirect('mostrarCarrito')
+
 ###Cliente
 
 ###Vendedor
