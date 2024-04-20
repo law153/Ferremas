@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-md-2 d-flex flex-column justify-content-center align-items-end">
 
-                    <form name="contador" id="boton-cant" method="POST" action="#">
+                    <form name="contador" id="boton-cant" method="POST" action="{% url 'cambiarCantidad' i.id_detalle%}">
                         {% csrf_token %}
                         <input type="number" min="1" max="{{ i.producto.stock }}" value="{{ i.cantidad }}" name="nueva_cantidad_{{ i.id_detalle }}" id="cantidad" class="form-control mb-2">
                         <input type="submit" value="Aceptar" class="btn btn-primary">
@@ -34,7 +34,7 @@
                 
                 <div class="col-md-2 d-flex flex-column justify-content-center align-items-end">
 
-                    <form name="borrar-form" id="borrar-boton" method="POST" action="#">
+                    <form name="borrar-form" id="borrar-boton" method="POST" action="{% url 'sacarDelCarro' i.id_detalle%}">
                         {% csrf_token %}
                         <input type="hidden" name="producto_id" value="{{ i.producto.id }}">
                         <button type="submit" class="btn btn-danger">Eliminar</button>

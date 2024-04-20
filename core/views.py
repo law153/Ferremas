@@ -245,12 +245,33 @@ def agregarAlCarrito(request):
             
     return redirect('mostrarCarrito')
 
-###Cliente
+def sacarDelCarro(request, cod_detalle):
+    
+    detalle = Detalle.objects.get(id_detalle = cod_detalle)
+    detalle.delete()
+        
 
-###Vendedor
+    return redirect('mostrarCarrito')
+   
 
-###Contador
+def cambiarCantidad(request, cod_detalle):
 
-###Bodeguero
+    detalle = Detalle.objects.get(id_detalle = cod_detalle)
+    cant = int(request.POST['nueva_cantidad_{}'.format(cod_detalle)])
+    producto = Producto.objects.get(cod_prod = detalle.producto.cod_prod)
 
-###Administrador
+    stockC = producto.stock
+    cantidadC = int(cant)
+
+    if cantidadC >= 0:
+        if cantidadC <= stockC:
+            detalle.cantidad = cantidadC
+            detalle.subtotal = detalle.producto.precio * cantidadC
+            detalle.save()
+            return redirect('mostrarCarrito')
+        else:
+            messages.warning(request,'La cantidad no puede exceder el stock disponible')
+            return redirect('mostrarCarrito')
+    else:
+        messages.warning(request,'La cantidad no puede ser menor a 1')
+        return redirect('mostrarCarrito')
