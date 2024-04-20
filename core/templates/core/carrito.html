@@ -18,11 +18,32 @@
                 <div class="col-md-4">
                     <img src="{{ i.producto.foto_prod.url }}" class="img-fluid imagen_prod" alt="No hay imagen disponible">
                 </div>
-                <div class="col-md-8 d-flex flex-column justify-content-center">
+                <div class="col-md-4 d-flex flex-column justify-content-center">
                     <h2>{{ i.producto.nombre_prod }}</h2>
                     <p class="mb-0">${{ i.subtotal }}</p>
                 </div>
+                <div class="col-md-2 d-flex flex-column justify-content-center align-items-end">
+
+                    <form name="contador" id="boton-cant" method="POST" action="#">
+                        {% csrf_token %}
+                        <input type="number" min="1" max="{{ i.producto.stock }}" value="{{ i.cantidad }}" name="nueva_cantidad_{{ i.id_detalle }}" id="cantidad" class="form-control mb-2">
+                        <input type="submit" value="Aceptar" class="btn btn-primary">
+                    </form>
+                    
+                </div>
+                
+                <div class="col-md-2 d-flex flex-column justify-content-center align-items-end">
+
+                    <form name="borrar-form" id="borrar-boton" method="POST" action="#">
+                        {% csrf_token %}
+                        <input type="hidden" name="producto_id" value="{{ i.producto.id }}">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                    
+                </div>
             </div>
+            
+            
         {% endfor %}
 
 
