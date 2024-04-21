@@ -81,7 +81,18 @@ class FiltrarCarritoAPI(APIView):
         # Serializar los resultados y devolver la respuesta
         serializer = ventaSerializer(carrito, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class DetallesCarritoAPI(APIView):
+    def get(self, request):
+        # Obtener el ID de la venta desde los parámetros de la URL
+        id_venta = request.GET.get('venta')
 
+        # Buscar todos los detalles del carrito basados en el ID de la venta
+        detalles_carrito = Detalle.objects.filter(venta=id_venta)
+
+        # Serializar los resultados y devolver la respuesta
+        serializer = detalleSerializer(detalles_carrito, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 ###No hay cuenta
