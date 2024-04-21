@@ -268,7 +268,7 @@ def modificar_total_carrito(id_venta, nuevo_total):
     data = {'total': nuevo_total}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud POST para modificar el total del carrito
-    respuesta = requests.post(url_servicio, data=data)
+    respuesta = requests.patch(url_servicio, data=data)
 
     if respuesta.status_code == 200:
         print('El total del carrito se modificó correctamente.')
@@ -280,7 +280,7 @@ def modificar_estado_carrito(id_venta, estado):
     data = {'estado': estado}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud POST para modificar el total del carrito
-    respuesta = requests.post(url_servicio, data=data)
+    respuesta = requests.patch(url_servicio, data=data)
 
     if respuesta.status_code == 200:
         print('El estado del carrito se modificó correctamente.')
@@ -301,7 +301,7 @@ def modificar_cantidad_detalle(id_detalle, nueva_cantidad):
     data = {'cantidad': nueva_cantidad}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud PUT para modificar la cantidad del detalle
-    respuesta = requests.put(url_servicio, data=data)
+    respuesta = requests.patch(url_servicio, data=data)
 
     if respuesta.status_code == 200:
         print('La cantidad del detalle se modificó correctamente.')
@@ -313,7 +313,7 @@ def modificar_subtotal_detalle(id_detalle, nuevo_subtotal):
     data = {'subtotal': nuevo_subtotal}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud PUT para modificar el subtotal del detalle
-    respuesta = requests.put(url_servicio, data=data)
+    respuesta = requests.patch(url_servicio, data=data)
 
     if respuesta.status_code == 200:
         print('El subtotal del detalle se modificó correctamente.')
@@ -386,6 +386,43 @@ def cambiarCantidad(request, cod_detalle):
 
 def agregarAlCarrito(request):
     cod_produc = request.POST['codigo']
+    productoC = obtener_producto(cod_produc)
+    productoC = productoC[0]
+
+    username = request.session.get('username')
+    usuarioC = obtener_usuario(username)
+        
+    fecha_hoy = date.today()
+    entrega = timedelta(999)
+    fecha_e = fecha_hoy + entrega
+
+    carrito = obtener_venta(usuarioC['id_usuario'],'ACTIVO')
+    carrito = carrito[0]
+
+    if carrito:
+        detalle1 = buscar_DetallesCarrito(carrito['id_venta'], cod_produc)
+        if detalle1:
+            detalle1 = detalle1[0]
+            modificar_cantidad_detalle(detalle1['id_detalle'], detalle1['cantidad']+1)
+            print(detalle1['id_detalle'])
+            print(detalle1['cantidad']+1)
+            modificar_subtotal_detalle(detalle1['id_detalle'], detalle1['subtotal'] + productoC['precio'])
+            recalcular_total_venta(detalle1['venta'])
+                
+        else:
+            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC['precio'],venta = carrito,producto = productoC)
+            recalcular_total_venta(detalle.venta.id_venta)
+
+    else:
+        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC['precio'], carrito = 1, usuario = usuarioC)
+
+        Detalle.objects.create(cantidad = 1,subtotal = productoC['precio'],venta = carrito, producto = productoC)
+
+    
+    return redirect('mostrarCarrito')
+"""
+def agregarAlCarrito(request):
+    cod_produc = request.POST['codigo']
     productoC = Producto.objects.get(cod_prod = cod_produc)
 
 
@@ -420,3 +457,4 @@ def agregarAlCarrito(request):
 
     
     return redirect('mostrarCarrito')
+"""
