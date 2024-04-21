@@ -322,17 +322,18 @@ def agregarAlCarrito(request):
             detalle.cantidad += 1
             detalle.subtotal += productoC.precio
             detalle.save()
-
+            recalcular_total_venta(detalle.venta.id_venta)
                 
         else:
-            Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
-
+            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
+            recalcular_total_venta(detalle.venta.id_venta)
 
     else:
         carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC.precio, carrito = 1, usuario = usuarioC)
 
         Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito, producto = productoC)
-            
+
+    
     return redirect('mostrarCarrito')
 
 def sacarDelCarro(request, cod_detalle):
@@ -340,7 +341,7 @@ def sacarDelCarro(request, cod_detalle):
     detalle = Detalle.objects.get(id_detalle = cod_detalle)
     detalle.delete()
         
-
+    recalcular_total_venta(detalle.venta.id_venta)
     return redirect('mostrarCarrito')
    
 
@@ -358,6 +359,7 @@ def cambiarCantidad(request, cod_detalle):
             detalle.cantidad = cantidadC
             detalle.subtotal = detalle.producto.precio * cantidadC
             detalle.save()
+            recalcular_total_venta(detalle.venta.id_venta)
             return redirect('mostrarCarrito')
         else:
             messages.warning(request,'La cantidad no puede exceder el stock disponible')
