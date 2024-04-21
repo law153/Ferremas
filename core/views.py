@@ -121,6 +121,21 @@ class DetallesBuscarCarritoAPI(APIView):
         serializer = detalleConProductoSerializer(detalles_carrito, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class CrearDetalleAPI(APIView):
+    def post(self, request):
+        serializer = detalleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CrearVentaAPI(APIView):
+    def post(self, request):
+        serializer = ventaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 ###No hay cuenta
 def mostrarIndex(request):
@@ -296,6 +311,43 @@ def recalcular_total_venta(venta_id):
     venta.total = total_venta
     venta.save()
 
+def crearDetalle(cantidad, subtotal, venta, producto):
+    data = {
+    'cantidad': cantidad,
+    'subtotal': subtotal,
+    'venta': venta,  
+    'producto': producto  
+    }
+
+    url_servicio = 'http://127.0.0.1:8000/api/crear-detalle/'
+
+    respuesta = requests.post(url_servicio, data=data)
+
+    if respuesta.status_code == 201:
+        print('Detalle creado correctamente.')
+    else:
+        print('Error al crear el detalle.')
+
+def crearVenta(fecha_venta, estado, fecha_entrega, total, carrito, usuario):
+
+    data = {
+    'fecha_venta': fecha_venta,
+    'estado': estado,
+    'fecha_entrega': fecha_entrega,  
+    'total': total,
+    'carrito' : carrito,
+    'usuario' : usuario
+    }
+
+    url_servicio = 'http://127.0.0.1:8000/api/crear-venta/'
+
+    respuesta = requests.post(url_servicio, data=data)
+
+    if respuesta.status_code == 201:
+        print('Venta creada correctamente.')
+    else:
+        print('Error al crear la venta.')
+
 def modificar_cantidad_detalle(id_detalle, nueva_cantidad):
     url_servicio = f'http://127.0.0.1:8000/api/detalle/{id_detalle}/'
     data = {'cantidad': nueva_cantidad}  # Datos a enviar en la solicitud
@@ -397,64 +449,29 @@ def agregarAlCarrito(request):
     fecha_e = fecha_hoy + entrega
 
     carrito = obtener_venta(usuarioC['id_usuario'],'ACTIVO')
-    carrito = carrito[0]
+    
 
     if carrito:
+        carrito = carrito[0]
         detalle1 = buscar_DetallesCarrito(carrito['id_venta'], cod_produc)
         if detalle1:
             detalle1 = detalle1[0]
             modificar_cantidad_detalle(detalle1['id_detalle'], detalle1['cantidad']+1)
-            print(detalle1['id_detalle'])
-            print(detalle1['cantidad']+1)
             modificar_subtotal_detalle(detalle1['id_detalle'], detalle1['subtotal'] + productoC['precio'])
             recalcular_total_venta(detalle1['venta'])
                 
         else:
-            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC['precio'],venta = carrito,producto = productoC)
-            recalcular_total_venta(detalle.venta.id_venta)
+            detalle1 = crearDetalle(1, productoC['precio'], carrito['id_venta'], cod_produc)
+            idventa = carrito['id_venta']
+            recalcular_total_venta(idventa)
 
     else:
-        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC['precio'], carrito = 1, usuario = usuarioC)
-
-        Detalle.objects.create(cantidad = 1,subtotal = productoC['precio'],venta = carrito, producto = productoC)
-
-    
-    return redirect('mostrarCarrito')
-"""
-def agregarAlCarrito(request):
-    cod_produc = request.POST['codigo']
-    productoC = Producto.objects.get(cod_prod = cod_produc)
-
-
-    username = request.session.get('username')
-    usuarioC = Usuario.objects.get(correo = username)
         
-    fecha_hoy = date.today()
-    entrega = timedelta(999)
-    fecha_e = fecha_hoy + entrega
-
-    carrito = Venta.objects.filter(usuario = usuarioC, estado='ACTIVO').first()
-
-
-    if carrito:
-        detalle1 = Detalle.objects.filter(venta = carrito, producto = productoC)
-        if detalle1:
-            detalle = Detalle.objects.get(venta = carrito, producto = productoC)
-            detalle.cantidad += 1
-            detalle.subtotal += productoC.precio
-            detalle.save()
-            recalcular_total_venta(detalle.venta.id_venta)
-
-                
-        else:
-            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
-            recalcular_total_venta(detalle.venta.id_venta)
-
-    else:
-        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC.precio, carrito = 1, usuario = usuarioC)
-
-        Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito, producto = productoC)
+        carrito = crearVenta(fecha_hoy, 'ACTIVO', fecha_e, productoC['precio'], 1, usuarioC['id_usuario'])
+        venta = obtener_venta(usuarioC['id_usuario'], 'ACTIVO')
+        venta = venta[0]
+        idventa = venta['id_venta']
+        crearDetalle(1, productoC['precio'], idventa, cod_produc)
 
     
     return redirect('mostrarCarrito')
-"""

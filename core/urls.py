@@ -30,4 +30,6 @@ urlpatterns=[
     path('api/detalles-buscar-carrito/', views.DetallesBuscarCarritoAPI.as_view(), name='detalles-buscar-carrito'),
     path('api/detalle/<str:id_detalle>/', DetallePorIdApi.as_view(), name='detalle-por-id'),
     path('api/venta/<str:id_venta>/', VentaPorIdApi.as_view(), name='venta-por-id'),
+    path('api/crear-detalle/', views.CrearDetalleAPI.as_view(), name='crear-detalle'),
+    path('api/crear-venta/', views.CrearVentaAPI.as_view(), name='crear-venta'),
 ]
