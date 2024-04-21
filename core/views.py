@@ -61,6 +61,11 @@ class listaDetallesApi(generics.ListAPIView):
     queryset = Detalle.objects.all()
     serializer_class = detalleSerializer
 
+class DetallePorIdApi(generics.RetrieveUpdateAPIView):
+    queryset = Detalle.objects.all()
+    serializer_class = detalleSerializer
+    lookup_field = 'id_detalle'
+
 class listaDetallesProductoApi(generics.ListAPIView):
     queryset = Detalle.objects.all()
     serializer_class = detalleConProductoSerializer
@@ -98,10 +103,23 @@ class DetallesCarritoAPI(APIView):
         serializer = detalleConProductoSerializer(detalles_carrito, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class VentaPorIdApi(generics.RetrieveAPIView):
+class VentaPorIdApi(generics.RetrieveUpdateAPIView):
     queryset = Venta.objects.all()
     serializer_class =ventaSerializer
     lookup_field = 'id_venta'
+
+class DetallesBuscarCarritoAPI(APIView):
+    def get(self, request):
+        # Obtener el ID de la venta y el código del producto desde los parámetros de la URL
+        id_venta = request.GET.get('venta')
+        cod_producto = request.GET.get('producto')
+
+        # Filtrar los detalles del carrito basados en el ID de la venta y el código del producto
+        detalles_carrito = Detalle.objects.filter(venta=id_venta, producto__cod_prod=cod_producto)
+
+        # Serializar los resultados y devolver la respuesta
+        serializer = detalleConProductoSerializer(detalles_carrito, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 ###No hay cuenta
@@ -236,9 +254,17 @@ def obtener_detallesVenta(venta):
         return respuesta.json()
     else:
         return None
+    
+def buscar_DetallesCarrito(venta, cod_prod):
+    url_servicio = f'http://127.0.0.1:8000/api/detalles-buscar-carrito/?venta={venta}&producto={cod_prod}'
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None
 
 def modificar_total_carrito(id_venta, nuevo_total):
-    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}'
+    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}/'
     data = {'total': nuevo_total}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud POST para modificar el total del carrito
@@ -250,7 +276,7 @@ def modificar_total_carrito(id_venta, nuevo_total):
         print('Hubo un error al modificar el total del carrito.')
 
 def modificar_estado_carrito(id_venta, estado):
-    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}'
+    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}/'
     data = {'estado': estado}  # Datos a enviar en la solicitud
 
     # Realizar la solicitud POST para modificar el total del carrito
@@ -269,6 +295,30 @@ def recalcular_total_venta(venta_id):
     venta = Venta.objects.get(id_venta=venta_id)
     venta.total = total_venta
     venta.save()
+
+def modificar_cantidad_detalle(id_detalle, nueva_cantidad):
+    url_servicio = f'http://127.0.0.1:8000/api/detalle/{id_detalle}/'
+    data = {'cantidad': nueva_cantidad}  # Datos a enviar en la solicitud
+
+    # Realizar la solicitud PUT para modificar la cantidad del detalle
+    respuesta = requests.put(url_servicio, data=data)
+
+    if respuesta.status_code == 200:
+        print('La cantidad del detalle se modificó correctamente.')
+    else:
+        print('Hubo un error al modificar la cantidad del detalle.')
+
+def modificar_subtotal_detalle(id_detalle, nuevo_subtotal):
+    url_servicio = f'http://127.0.0.1:8000/api/detalle/{id_detalle}/'
+    data = {'subtotal': nuevo_subtotal}  # Datos a enviar en la solicitud
+
+    # Realizar la solicitud PUT para modificar el subtotal del detalle
+    respuesta = requests.put(url_servicio, data=data)
+
+    if respuesta.status_code == 200:
+        print('El subtotal del detalle se modificó correctamente.')
+    else:
+        print('Hubo un error al modificar el subtotal del detalle.')
 
 
 def inicioSesion(request):
@@ -302,40 +352,6 @@ def cierreSesion(request):
     return redirect('mostrarIndex')
 
 
-def agregarAlCarrito(request):
-    cod_produc = request.POST['codigo']
-    productoC = Producto.objects.get(cod_prod = cod_produc)
-
-    username = request.session.get('username')
-    usuarioC = Usuario.objects.get(correo = username)
-        
-    fecha_hoy = date.today()
-    entrega = timedelta(999)
-    fecha_e = fecha_hoy + entrega
-
-    carrito = Venta.objects.filter(usuario = usuarioC, estado='ACTIVO').first()
-
-    if carrito:
-        detalle1 = Detalle.objects.filter(venta = carrito, producto = productoC)
-        if detalle1:
-            detalle = Detalle.objects.get(venta = carrito, producto = productoC)
-            detalle.cantidad += 1
-            detalle.subtotal += productoC.precio
-            detalle.save()
-            recalcular_total_venta(detalle.venta.id_venta)
-                
-        else:
-            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
-            recalcular_total_venta(detalle.venta.id_venta)
-
-    else:
-        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC.precio, carrito = 1, usuario = usuarioC)
-
-        Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito, producto = productoC)
-
-    
-    return redirect('mostrarCarrito')
-
 def sacarDelCarro(request, cod_detalle):
     
     detalle = Detalle.objects.get(id_detalle = cod_detalle)
@@ -367,3 +383,40 @@ def cambiarCantidad(request, cod_detalle):
     else:
         messages.warning(request,'La cantidad no puede ser menor a 1')
         return redirect('mostrarCarrito')
+
+def agregarAlCarrito(request):
+    cod_produc = request.POST['codigo']
+    productoC = Producto.objects.get(cod_prod = cod_produc)
+
+
+    username = request.session.get('username')
+    usuarioC = Usuario.objects.get(correo = username)
+        
+    fecha_hoy = date.today()
+    entrega = timedelta(999)
+    fecha_e = fecha_hoy + entrega
+
+    carrito = Venta.objects.filter(usuario = usuarioC, estado='ACTIVO').first()
+
+
+    if carrito:
+        detalle1 = Detalle.objects.filter(venta = carrito, producto = productoC)
+        if detalle1:
+            detalle = Detalle.objects.get(venta = carrito, producto = productoC)
+            detalle.cantidad += 1
+            detalle.subtotal += productoC.precio
+            detalle.save()
+            recalcular_total_venta(detalle.venta.id_venta)
+
+                
+        else:
+            detalle = Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito,producto = productoC)
+            recalcular_total_venta(detalle.venta.id_venta)
+
+    else:
+        carrito = Venta.objects.create(fecha_venta = fecha_hoy,estado = "ACTIVO",fecha_entrega = fecha_e,total = productoC.precio, carrito = 1, usuario = usuarioC)
+
+        Detalle.objects.create(cantidad = 1,subtotal = productoC.precio,venta = carrito, producto = productoC)
+
+    
+    return redirect('mostrarCarrito')
