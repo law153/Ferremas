@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView
 from django.shortcuts import render, redirect
 from datetime import date, timedelta
 from django.contrib import messages
-from core.serializers import categoriaSerializer, usuarioSerializer, productoSerializer, consultaSerializer, ventaSerializer, detalleSerializer, detalleCompradoSerializer
+from core.serializers import categoriaSerializer, usuarioSerializer, productoSerializer, consultaSerializer, ventaSerializer, detalleSerializer, detalleCompradoSerializer, detalleConProductoSerializer
 from .models import Rol, Pregunta, Categoria, Consulta, Usuario, Producto, Venta, Detalle,  Detalle_comprado
 import requests
 from django.contrib.auth.models import User
@@ -60,6 +60,10 @@ class listaConsultasApi(generics.ListAPIView):
 class listaDetallesApi(generics.ListAPIView):
     queryset = Detalle.objects.all()
     serializer_class = detalleSerializer
+
+class listaDetallesProductoApi(generics.ListAPIView):
+    queryset = Detalle.objects.all()
+    serializer_class = detalleConProductoSerializer
 
 class listaComprasApi(generics.ListAPIView):
     queryset = Detalle_comprado.objects.all()

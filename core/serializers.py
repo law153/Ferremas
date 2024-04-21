@@ -37,3 +37,10 @@ class detalleCompradoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Detalle_comprado
         fields = '__all__'
+
+class detalleConProductoSerializer(serializers.ModelSerializer):
+    producto = productoSerializer()  
+
+    class Meta:
+        model = Detalle
+        fields = '__all__'
