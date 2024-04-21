@@ -24,4 +24,5 @@ urlpatterns=[
     path('api/consultas/', views.listaConsultasApi.as_view(), name='api-consultas'),
     path('api/producto/', views.productoApi.as_view(), name='api-producto'),
     path('api/usuario/<str:correo>/', UsuarioPorCorreoApi.as_view(), name='usuario-por-correo'),
+     path('api/filtrar-carrito/', views.FiltrarCarritoAPI.as_view(), name='filtrar-carrito'),
 ]

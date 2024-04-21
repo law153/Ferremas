@@ -10,6 +10,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import authenticate,login, logout
 import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 ##Serializers para las tablas
@@ -62,6 +65,22 @@ class listaComprasApi(generics.ListAPIView):
     queryset = Detalle_comprado.objects.all()
     serializer_class = detalleCompradoSerializer
 
+class FiltrarCarritoAPI(APIView):
+    def get(self, request):
+        # Obtener los parámetros de consulta de la URL
+        usuario = request.GET.get('usuario')
+        estado = request.GET.get('estado')
+
+        # Filtrar usuarios basados en los parámetros
+        carrito = Venta.objects.all()
+        if carrito:
+            carrito = carrito.filter(usuario=usuario)
+        if estado:
+            carrito = carrito.filter(estado=estado)
+
+        # Serializar los resultados y devolver la respuesta
+        serializer = ventaSerializer(carrito, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
