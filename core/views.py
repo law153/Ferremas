@@ -95,8 +95,13 @@ class DetallesCarritoAPI(APIView):
         detalles_carrito = Detalle.objects.filter(venta=id_venta)
 
         # Serializar los resultados y devolver la respuesta
-        serializer = detalleSerializer(detalles_carrito, many=True)
+        serializer = detalleConProductoSerializer(detalles_carrito, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class VentaPorIdApi(generics.RetrieveAPIView):
+    queryset = Venta.objects.all()
+    serializer_class =ventaSerializer
+    lookup_field = 'id_venta'
 
 
 ###No hay cuenta
@@ -151,30 +156,31 @@ def mostrarCarrito(request):
     rol = request.session.get('rol',0)
 
     username = request.session.get('username')
-    usuario1 = Usuario.objects.get(correo = username)
+    usuario1 = obtener_usuario(username)
 
-    carrito = Venta.objects.filter(usuario = usuario1, estado='ACTIVO').first()
+    carrito = obtener_venta(usuario1['id_usuario'], 'ACTIVO')
+    carrito = carrito[0]
 
     if carrito:
-        detalles = Detalle.objects.filter(venta = carrito)
+        detalles = obtener_detallesVenta(carrito['id_venta'])
         totalV = 0
         for i in detalles:
-
-            if i.producto.stock <= 0:
+            producto = i['producto']
+            if producto['stock'] <= 0:
                 i.delete()
-                messages.warning(request,'Un producto de su carrito se quedó sin stock')
-                return redirect('mostrarCarritoCli')
+                
+                return redirect('mostrarCarrito')
                     
-            totalV += i.subtotal
-        carrito.total = totalV
-        carrito.save()
+            totalV += i['subtotal']
+        modificar_total_carrito(carrito['id_venta'], totalV)
+        
         contexto = {"categorias" : categorias, "carrito" : detalles, "venta" : carrito}
         if not detalles:
-            carrito.estado = 'INACTIVO'
-            carrito.save()
+            modificar_estado_carrito(carrito['id_venta'],'INACTIVO')
+            
     else:
         contexto = {"categorias" : categorias, "rol": rol}
-        messages.warning(request,'No hay productos en el carrito actualmente')
+
 
     
     return render(request, 'core/carrito.html',contexto)
@@ -213,6 +219,56 @@ def obtener_usuario(correo):
         return respuesta.json()
     else:
         return None 
+
+def obtener_venta(usuario, estado):
+    url_servicio = f'http://127.0.0.1:8000/api/filtrar-carrito/?usuario={usuario}&estado={estado}'
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        
+        return respuesta.json()
+    else:
+        return None  
+
+def obtener_detallesVenta(venta):
+    url_servicio = f'http://127.0.0.1:8000/api/detalles-carrito/?venta={venta}'
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None
+
+def modificar_total_carrito(id_venta, nuevo_total):
+    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}'
+    data = {'total': nuevo_total}  # Datos a enviar en la solicitud
+
+    # Realizar la solicitud POST para modificar el total del carrito
+    respuesta = requests.post(url_servicio, data=data)
+
+    if respuesta.status_code == 200:
+        print('El total del carrito se modificó correctamente.')
+    else:
+        print('Hubo un error al modificar el total del carrito.')
+
+def modificar_estado_carrito(id_venta, estado):
+    url_servicio = f'http://127.0.0.1:8000/api/venta/{id_venta}'
+    data = {'estado': estado}  # Datos a enviar en la solicitud
+
+    # Realizar la solicitud POST para modificar el total del carrito
+    respuesta = requests.post(url_servicio, data=data)
+
+    if respuesta.status_code == 200:
+        print('El estado del carrito se modificó correctamente.')
+    else:
+        print('Hubo un error al modificar el estado del carrito.')
+
+    
+def recalcular_total_venta(venta_id):
+    detalles_venta = Detalle.objects.filter(venta=venta_id)
+    total_venta = sum(detalle.subtotal for detalle in detalles_venta)
+    print(total_venta)
+    venta = Venta.objects.get(id_venta=venta_id)
+    venta.total = total_venta
+    venta.save()
 
 
 def inicioSesion(request):
