@@ -102,6 +102,15 @@ class DetallesCarritoAPI(APIView):
         # Serializar los resultados y devolver la respuesta
         serializer = detalleConProductoSerializer(detalles_carrito, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class DetallesCarritoPorIdAPI(APIView):
+    def get(self, request):
+        id_detalle = request.GET.get('id_detalle')
+
+        detalles_carrito = Detalle.objects.filter(id_detalle=id_detalle)
+
+        serializer = detalleConProductoSerializer(detalles_carrito, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class VentaPorIdApi(generics.RetrieveUpdateAPIView):
     queryset = Venta.objects.all()
@@ -270,6 +279,14 @@ def obtener_detallesVenta(venta):
     else:
         return None
     
+def obtener_detallesId(id):
+    url_servicio = f'http://127.0.0.1:8000/api/detalles-id-carrito/?id_detalle={id}'
+    respuesta = requests.get(url_servicio)
+    if respuesta.status_code == 200:
+        return respuesta.json()
+    else:
+        return None
+    
 def buscar_DetallesCarrito(venta, cod_prod):
     url_servicio = f'http://127.0.0.1:8000/api/detalles-buscar-carrito/?venta={venta}&producto={cod_prod}'
     respuesta = requests.get(url_servicio)
@@ -415,19 +432,19 @@ def sacarDelCarro(request, cod_detalle):
 
 def cambiarCantidad(request, cod_detalle):
 
-    detalle = Detalle.objects.get(id_detalle = cod_detalle)
+    detalle = obtener_detallesId(cod_detalle)
+    detalle = detalle[0]
     cant = int(request.POST['nueva_cantidad_{}'.format(cod_detalle)])
-    producto = Producto.objects.get(cod_prod = detalle.producto.cod_prod)
+    producto = detalle['producto']
 
-    stockC = producto.stock
+    stockC = producto['stock']
     cantidadC = int(cant)
 
     if cantidadC >= 0:
         if cantidadC <= stockC:
-            detalle.cantidad = cantidadC
-            detalle.subtotal = detalle.producto.precio * cantidadC
-            detalle.save()
-            recalcular_total_venta(detalle.venta.id_venta)
+            modificar_cantidad_detalle(cod_detalle, cantidadC)
+            modificar_subtotal_detalle(cod_detalle, producto['precio'] * cantidadC )
+            recalcular_total_venta(detalle['venta'])
             return redirect('mostrarCarrito')
         else:
             messages.warning(request,'La cantidad no puede exceder el stock disponible')
