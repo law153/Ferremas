@@ -28,6 +28,7 @@ urlpatterns=[
     path('api/filtrar-carrito/', views.FiltrarCarritoAPI.as_view(), name='filtrar-carrito'),
     path('api/detalles-carrito/', views.DetallesCarritoAPI.as_view(), name='detalles-carrito'),
     path('api/detalles-id-carrito/', views.DetallesCarritoPorIdAPI.as_view(), name='detalles-id-carrito'),
+    path('api/delete-detalle/', views.DeleteDetallePorIdApi.as_view(), name='delete-detalle'),
     path('api/detalles-buscar-carrito/', views.DetallesBuscarCarritoAPI.as_view(), name='detalles-buscar-carrito'),
     path('api/detalle/<str:id_detalle>/', DetallePorIdApi.as_view(), name='detalle-por-id'),
     path('api/venta/<str:id_venta>/', VentaPorIdApi.as_view(), name='venta-por-id'),

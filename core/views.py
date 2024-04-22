@@ -66,6 +66,18 @@ class DetallePorIdApi(generics.RetrieveUpdateAPIView):
     serializer_class = detalleSerializer
     lookup_field = 'id_detalle'
 
+class DeleteDetallePorIdApi(APIView):
+    def delete(self, request):
+        id_detalle = request.GET.get('id_detalle')
+
+        try:
+            detalle = Detalle.objects.get(id_detalle=id_detalle)
+        except Detalle.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        detalle.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class listaDetallesProductoApi(generics.ListAPIView):
     queryset = Detalle.objects.all()
     serializer_class = detalleConProductoSerializer
@@ -389,6 +401,13 @@ def modificar_subtotal_detalle(id_detalle, nuevo_subtotal):
     else:
         print('Hubo un error al modificar el subtotal del detalle.')
 
+def eliminar_detalle(id_detalle):
+    url_servicio = f'http://127.0.0.1:8000/api/delete-detalle/?id_detalle={id_detalle}'
+    respuesta = requests.delete(url_servicio)
+    if respuesta.status_code == 204:
+        print('Detalle eliminado correctamente.')
+    else:
+        print('Error al eliminar el detalle.')
 
 def inicioSesion(request):
     if request.method == 'POST':
@@ -423,10 +442,12 @@ def cierreSesion(request):
 
 def sacarDelCarro(request, cod_detalle):
     
-    detalle = Detalle.objects.get(id_detalle = cod_detalle)
-    detalle.delete()
+    detalle = obtener_detallesId(cod_detalle)
+    detalle = detalle[0]
+
+    eliminar_detalle(cod_detalle)
         
-    recalcular_total_venta(detalle.venta.id_venta)
+    recalcular_total_venta( detalle['venta'] )
     return redirect('mostrarCarrito')
    
 
