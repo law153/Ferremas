@@ -7,6 +7,8 @@
 
 {% block disenos %}
     <link rel="stylesheet" type="text/css" href="{% static  'core/css/general.css'%}">
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=AczGthJPkhe4g6zvL1uIQLkbbV3jTWO_KZFpOXMc6ElR_hXvWCa6-uyVYlAJO6RoDZzRaH046xuXpmbG&currency=USD"></script>
 {% endblock disenos %}
 
 {% block cuerpo %}
@@ -54,6 +56,37 @@
                 <form name="pagar-form" id="pagar-boton" method="POST" action="#">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-success ml-2">Pagar</button>
+                    <DIV id="paypal-button-container"></DIV>
+                    <script>
+                        var plata = "<?php echo round($dolar, 2) ?>";
+                        paypal.Buttons({
+                            style: {
+                                color: "silver",
+                                shape: "pill",
+                                label: "paypal",
+                            },
+                            createOrder: function (data, actions) {
+                                return actions.order.create({
+                                    purchase_units: [{
+                                        amount: {
+                                            value: plata
+                                        }
+                                    }]
+                                })
+                            },
+                            onApprove: function (data, actions) {
+                                actions.order.capture().then(function (detalles) {
+                                    document.getElementById("submit").disabled = false
+
+                                })
+                            },
+
+                            onCancel: function (data) {
+                                alert("Pago cancelado")
+                                console.log(data);
+                            },
+                        }).render('#paypal-button-container');
+                    </script>
                 </form>
             </div>
             <div class="col-md-2"></div>
